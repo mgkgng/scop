@@ -2,9 +2,17 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "Parser.hpp"
+
 int main(int argc, char** argv) {
-    (void) argc;
-    (void) argv;
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <obj file>" << std::endl;
+        return -1;
+    }
+    
+    scop::Parser parser(argv[1]);
+
+
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
