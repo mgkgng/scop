@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "Parser.hpp"
+#include "parsing/Parser.hpp"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
