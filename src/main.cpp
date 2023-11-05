@@ -12,35 +12,39 @@ int main(int argc, char** argv) {
     
     scop::Parser parser(argv[1]);
 
+    std::ostringstream oss;
+    oss << parser;
+    std::cout << oss.str() << std::endl;
+    
 
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
+    // if (!glfwInit()) {
+    //     std::cerr << "Failed to initialize GLFW" << std::endl;
+    //     return -1;
+    // }
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "SCOP", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
+    // GLFWwindow* window = glfwCreateWindow(640, 480, "SCOP", nullptr, nullptr);
+    // if (!window) {
+    //     std::cerr << "Failed to create GLFW window" << std::endl;
+    //     glfwTerminate();
+    //     return -1;
+    // }
 
-    glfwMakeContextCurrent(window);
+    // glfwMakeContextCurrent(window);
 
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
-        return -1;
-    }
+    // if (glewInit() != GLEW_OK) {
+    //     std::cerr << "Failed to initialize GLEW" << std::endl;
+    //     return -1;
+    // }
 
-    while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
+    // while (!glfwWindowShouldClose(window)) {
+    //     glClear(GL_COLOR_BUFFER_BIT);
 
-        // Render your 3D objects here
+    //     // Render your 3D objects here
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+    //     glfwSwapBuffers(window);
+    //     glfwPollEvents();
+    // }
 
-    glfwTerminate();
-    return 0;
+    // glfwTerminate();
+    // return 0;
 }

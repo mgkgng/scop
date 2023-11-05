@@ -29,6 +29,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 clean:
 	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*
 
+fclean: clean
+
+re: fclean all
+
 # Directories (if they don't exist)
 $(OBJ): | $(OBJ_DIR)
 
