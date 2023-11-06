@@ -25,12 +25,19 @@ struct Object {
     void addVertex(std::istringstream &iss, size_t &lineNb) { vertices.emplace_back(iss, lineNb); }
     void addTexCoord(std::istringstream &iss, size_t &lineNb) { texCoords.emplace_back(iss, lineNb); }
     void addNormal(std::istringstream &iss, size_t &lineNb) { normals.emplace_back(iss, lineNb); }
-    void addFace(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts) {
+    void addFace(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &materialName, int &smoothingGroup) {
         if (currentGroup == nullptr) {
             groups.emplace("default", Group(""));
             currentGroup = &groups[""];
         }
-        currentGroup->addFace(iss, lineNb, geometryElemCounts);
+        currentGroup->addFace(iss, lineNb, geometryElemCounts, materialName, smoothingGroup);
+    }
+    void addLine(std::istringstream &iss, size_t &lineNb, size_t &vertexCount) {
+        if (currentGroup == nullptr) {
+            groups.emplace("default", Group(""));
+            currentGroup = &groups[""];
+        }
+        currentGroup->addLine(iss, lineNb, vertexCount);
     }
     void addGroup(std::istringstream &iss, size_t &lineNb) {
         std::string name;
@@ -41,6 +48,8 @@ struct Object {
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Object& object) {
+            if (!object._name.empty())
+                os << "o " << object._name << std::endl;
             for (const auto& v : object.vertices)
                 os << v << std::endl;
             for (const auto& tc : object.texCoords)

@@ -9,10 +9,13 @@ namespace scop {
 
 struct Face {
     std::vector<int> vertexIndices, textureIndices, normalIndices;
+    std::string materialName;
+    int smoothingGroup;
 
     enum VertexType { VERTEX_ONLY, VERTEX_TEX, VERTEX_NORMAL, VERTEX_TEX_NORMAL };
 
-    Face(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts) {
+    Face(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &matName, int &sGroup) 
+        : materialName(matName), smoothingGroup(sGroup) {
         if (geometryElemCounts[VERTEX_INX] == 0)
             throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb));
 
@@ -80,6 +83,9 @@ struct Face {
         if (vertexIndices.empty())
             throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb));
     }
+
+    void setMaterialName(std::string const &name) { materialName = name; }
+    void setSmoothingGroup(unsigned int group) { smoothingGroup = group; }
 
     friend std::ostream& operator<<(std::ostream& os, const Face& f) {
         os << "f";

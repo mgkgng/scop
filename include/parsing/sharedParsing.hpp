@@ -8,6 +8,7 @@
 #define TEXCOORD "vt"
 #define NORMAL "vn"
 #define FACE "f"
+#define LINE "l"
 #define OBJ "o"
 #define GROUP "g"
 #define SMOOTHING_GROUP "s"
@@ -18,6 +19,7 @@
 
 #define VERTEX_TYPE 0
 #define FACE_TYPE 1
+#define LINE_TYPE 2
 
 enum VertexIndex { VERTEX_INX, TEX_INX, NORMAL_INX };
 

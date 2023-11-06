@@ -10,11 +10,18 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    scop::Parser parser(argv[1]);
+    try {
+        scop::Parser parser(argv[1]);
 
-    std::ostringstream oss;
-    oss << parser;
-    std::cout << oss.str() << std::endl;
+        std::ostringstream oss;
+        oss << parser;
+        std::cout << oss.str() << std::endl;
+
+    } catch (std::exception const &e) {
+        std::cerr << "Failed to parse file: " << argv[1] << std::endl;
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
     
 
     // if (!glfwInit()) {
