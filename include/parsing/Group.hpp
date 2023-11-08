@@ -14,12 +14,12 @@ struct Group {
     Group() = default;
     Group(std::string const &name) : name(name) {}
 
-    void addFace(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &materialName, int &smoothingGroup) {
-        faces.emplace_back(iss, lineNb, geometryElemCounts, materialName, smoothingGroup);
+    void addFace(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &materialName, int &smoothingGroup) {
+        faces.emplace_back(tokens, lineNb, geometryElemCounts, materialName, smoothingGroup);
     }
 
-    void addLine(std::istringstream &iss, size_t &lineNb, size_t &vertexCount) {
-        lines.emplace_back(iss, lineNb, vertexCount);
+    void addLine(std::vector<std::string> const &tokens, size_t &lineNb, size_t &vertexCount) {
+        lines.emplace_back(tokens, lineNb, vertexCount);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Group& g) {

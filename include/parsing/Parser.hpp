@@ -33,75 +33,100 @@ class Parser {
                     continue;
                 }
 
-                std::istringstream ss(line);
-                std::string prefix;
-                ss >> prefix;
-                
-                if (CHECK(prefix, VERTEX)) {
-                    checkElemOrder(VERTEX_TYPE, vertexDef, faceDef, lineDef, lineNb);
-                    checkObjExist();
-                    currentObject->vertices.emplace_back(ss, lineNb);
-                } else if (CHECK(prefix, TEXCOORD)) {
-                    checkElemOrder(VERTEX_TYPE, vertexDef, faceDef, lineDef, lineNb);
-                    checkObjExist();
-                    currentObject->texCoords.emplace_back(ss, lineNb);
-                } else if (CHECK(prefix, NORMAL)) {
-                    checkElemOrder(VERTEX_TYPE, vertexDef, faceDef, lineDef, lineNb);
-                    checkObjExist();
-                    currentObject->normals.emplace_back(ss, lineNb);
-                } else if (CHECK(prefix, FACE)) {
-                    if (!faceDef) {
-                        geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
-                        geometryElemCounts[TEX_INX] = currentObject->texCoords.size();
-                        geometryElemCounts[NORMAL_INX] = currentObject->normals.size();
-                    }
-                    checkElemOrder(FACE_TYPE, vertexDef, faceDef, lineDef, lineNb);
-                    checkObjExist();
-                    currentObject->addFace(ss, lineNb, geometryElemCounts, currentMaterial, currentSmoothingGroup);
-                } else if (CHECK(prefix, LINE)) {
-                    if (!lineDef)
-                        geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
-                    checkElemOrder(LINE_TYPE, vertexDef, faceDef, lineDef, lineNb);
-                    checkObjExist();
-                    currentObject->addLine(ss, lineNb, geometryElemCounts[VERTEX_INX]);
-                } else if (CHECK(prefix, OBJ)) {
-                    std::string name;
-                    ss >> name;
-                    checkIssParse(ss, lineNb, "Failed to parse object");
-                    _objects.emplace(name, Object(name));
-
-                    currentObject = &_objects[name];
-                    vertexDef = faceDef = false;
-                    geometryElemCounts = {0, 0, 0};
-                } else if (CHECK(prefix, GROUP)) {
-                    checkObjExist();
-                    currentObject->addGroup(ss, lineNb);
-                } else if (CHECK(prefix, SMOOTHING_GROUP)) {
-                    std::string sGroup;
-                    ss >> sGroup;
-                    if (sGroup == "off")
-                        currentSmoothingGroup = 0;
-                    else {
-                        try {
-                            currentSmoothingGroup = std::stoi(sGroup);
-                        } catch (std::exception &e) {
-                            std::cerr << "Failed to parse smoothing group on line " << lineNb << std::endl;
-                            throw std::exception();
-                        }
-                    }
-                    checkIssParse(ss, lineNb, "Failed to parse smoothing group");
-                } else if (CHECK(prefix, MATLIB)) {
-                    std::string matLib;
-                    ss >> matLib;
-                    checkIssParse(ss, lineNb, "Failed to parse material library");
-                    _materialLibraries.push_back(matLib);
-                } else if (CHECK(prefix, USRMTL)) {
-                    ss >> currentMaterial;
-                    checkIssParse(ss, lineNb, "Failed to parse material name");
-                } else {
-                    std::cerr << "Prefix not suppported: " << prefix << " on line " << lineNb << std::endl;
+                auto tokens = split(line, ' ');
+                if (tokens.size() < 2) {
+                    std::cerr << "Invalid line: " << lineNb << std::endl;
                     throw std::exception();
                 }
+
+                ElemType eType = getElemType(tokens[0]);
+                switch (eType) {
+                    case VERTEX:
+                        addGeometryElement(tokens, lineNb, VERTEX, vertexDef, faceDef, lineDef);
+                        break;
+
+                    case TEXCOORD:
+                        addGeometryElement(tokens, lineNb, TEXCOORD, vertexDef, faceDef, lineDef);
+                        break;
+
+                    case NORMAL:
+                        addGeometryElement(tokens, lineNb, NORMAL, vertexDef, faceDef, lineDef);
+                        break;
+
+                    case FACE:
+                        if (!faceDef) {
+                            geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
+                            geometryElemCounts[TEX_INX] = currentObject->texCoords.size();
+                            geometryElemCounts[NORMAL_INX] = currentObject->normals.size();
+                        }
+                        checkElemOrder(FACE_TYPE, vertexDef, faceDef, lineDef, lineNb);
+                        checkObjExist();
+                        currentObject->addFace(tokens, lineNb, geometryElemCounts, currentMaterial, currentSmoothingGroup);
+                        break;
+
+                    case LINE:
+                        if (!lineDef)
+                            geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
+                        checkElemOrder(LINE_TYPE, vertexDef, faceDef, lineDef, lineNb);
+                        checkObjExist();
+                        currentObject->addLine(tokens, lineNb, geometryElemCounts[VERTEX_INX]);
+                        break;
+
+                    case OBJ:
+                        if (tokens.size() != 2) {
+                            std::cerr << "Invalid object format on line " << lineNb << std::endl;
+                            throw std::exception();
+                        }
+                        _objects.emplace(tokens[1], Object(tokens[1]));
+                        currentObject = &_objects[tokens[1]];
+                        vertexDef = faceDef = false;
+                        geometryElemCounts = {0, 0, 0};
+                        break;
+
+                    case GROUP:
+                        checkObjExist();
+                        currentObject->addGroup(tokens, lineNb);
+                        break;
+
+                    case SMOOTHING_GROUP:
+                        if (tokens.size() != 2) {
+                            std::cerr << "Invalid smoothing group format on line " << lineNb << std::endl;
+                            throw std::exception();
+                        }
+                        if (tokens[1] == "off")
+                            currentSmoothingGroup = 0;
+                        else {
+                            try {
+                                currentSmoothingGroup = std::stoi(tokens[1]);
+                            } catch (std::exception &e) {
+                                std::cerr << "Failed to parse smoothing group on line " << lineNb << std::endl;
+                                throw std::invalid_argument("Failed to parse smoothing group");
+                            }
+                        }
+                        break;
+
+                    case MATLIB:
+                        if (tokens.size() != 2) {
+                            std::cerr << "Invalid material library format on line " << lineNb << std::endl;
+                            throw std::exception();
+                        }
+                        _materialLibraries.push_back(tokens[1]);
+                        break;
+
+                    case USEMTL:
+                        if (tokens.size() != 2) {
+                            std::cerr << "Invalid material name format on line " << lineNb << std::endl;
+                            throw std::exception();
+                        }
+                        currentMaterial = tokens[1];
+                        break;
+                    case UNKNOWN:
+                        std::cerr << "Unknown prefix: " << tokens[0] << " on line " << lineNb << std::endl;
+                        throw std::exception();
+                        break;
+
+                }
+
                 lineNb++;
             }
         }
@@ -115,6 +140,8 @@ class Parser {
             }
             return os;
         }
+
+
 
 
     private:
@@ -150,6 +177,17 @@ class Parser {
                 }
                 lineDef = true;
             }
+        }
+
+        void addGeometryElement(std::vector<std::string> const &tokens, size_t lineNb, int elemType, bool &vertexDef, bool &faceDef, bool &lineDef) {
+            checkElemOrder(VERTEX_TYPE, vertexDef, faceDef, lineDef, lineNb);
+            checkObjExist();
+            if (elemType == VERTEX)
+                currentObject->vertices.emplace_back(tokens, lineNb);
+            else if (elemType == TEXCOORD)
+                currentObject->texCoords.emplace_back(tokens, lineNb);
+            else
+                currentObject->normals.emplace_back(tokens, lineNb);
         }
 
         Object *currentObject = nullptr;

@@ -4,18 +4,40 @@
 #include <sstream>
 #include <vector>
 
-#define VERTEX "v"
-#define TEXCOORD "vt"
-#define NORMAL "vn"
-#define FACE "f"
-#define LINE "l"
-#define OBJ "o"
-#define GROUP "g"
-#define SMOOTHING_GROUP "s"
-#define MATLIB "mtllib"
-#define USRMTL "usemtl"
+enum ElemType {
+    VERTEX,
+    TEXCOORD,
+    NORMAL,
+    FACE,
+    LINE,
+    OBJ,
+    GROUP,
+    SMOOTHING_GROUP,
+    MATLIB,
+    USEMTL,
+    UNKNOWN // default case
+};
 
-#define CHECK(s, prefix) s == prefix
+const std::unordered_map<std::string, ElemType> elemMap = {
+    {"v", VERTEX},
+    {"vt", TEXCOORD},
+    {"vn", NORMAL},
+    {"f", FACE},
+    {"l", LINE},
+    {"o", OBJ},
+    {"g", GROUP},
+    {"s", SMOOTHING_GROUP},
+    {"mtllib", MATLIB},
+    {"usemtl", USEMTL}
+};
+
+ElemType getElemType(const std::string& prefix) {
+    auto it = elemMap.find(prefix);
+    if (it != elemMap.end()) {
+        return it->second;
+    }
+    return UNKNOWN;
+}
 
 #define VERTEX_TYPE 0
 #define FACE_TYPE 1
@@ -37,16 +59,22 @@ enum VertexIndex { VERTEX_INX, TEX_INX, NORMAL_INX };
 //         ├── Material Name (usemtl)
 //         └── Smoothing Group (s)
 
-void checkIssParse(std::istringstream &iss, size_t &lineNb, std::string const &errorMsg) {
-    if (iss.fail()) {
-        std::cerr << "Failed to parse line " << lineNb << std::endl;
-        throw std::runtime_error(errorMsg);
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        if (!token.empty()) { // Optionally skip empty tokens
+            tokens.push_back(token);
+        }
     }
+    return tokens;
+}
 
-    char extra;
-    iss >> std::noskipws >> extra;
-    if (!iss.eof()) {
-        std::cerr << "Wrong format for line " << lineNb << std::endl;
-        throw std::runtime_error(errorMsg);
-    }
+bool isFloat(const std::string& s) {
+    std::istringstream iss(s);
+    float f;
+    iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+    // Check the entire string was consumed and if either failbit or badbit is set
+    return iss.eof() && !iss.fail();
 }

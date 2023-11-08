@@ -7,9 +7,14 @@ namespace scop {
 struct Normal {
     float x, y, z;
 
-    Normal(std::istringstream &iss, size_t &lineNb) {
-        iss >> x >> y >> z;
-        checkIssParse(iss, lineNb, "Failed to parse normal");
+    Normal(std::vector<std::string> const &tokens, size_t &lineNb) {
+        if (tokens.size() != 4) {
+            std::cerr << "Invalid normal: " << lineNb << std::endl;
+            throw std::exception();
+        }
+        x = std::stof(tokens[1]);
+        y = std::stof(tokens[2]);
+        z = std::stof(tokens[3]);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Normal& n) {

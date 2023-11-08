@@ -14,32 +14,33 @@ struct Face {
 
     enum VertexType { VERTEX_ONLY, VERTEX_TEX, VERTEX_NORMAL, VERTEX_TEX_NORMAL };
 
-    Face(std::istringstream &iss, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &matName, int &sGroup) 
+    Face(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &matName, int &sGroup) 
         : materialName(matName), smoothingGroup(sGroup) {
         if (geometryElemCounts[VERTEX_INX] == 0)
             throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb));
 
-        std::string vertexStr;
+        if (tokens.size() < 4)
+            throw std::runtime_error("Error parsing face element: not enough vertices. line: " + std::to_string(lineNb));
+
         VertexType type = VERTEX_ONLY;
         bool firstVertex = true;
 
-        while (iss >> vertexStr) {
-            std::istringstream vertexStream(vertexStr);
+        for (size_t i = 1; i < tokens.size(); i++) {
+            std::istringstream iss(tokens[i]);
             int vIndex, vtIndex, vnIndex;
             char slash;
-            
-            // Parse vertex index
-            if (!(vertexStream >> vIndex))
+
+            if (!(iss >> vIndex))
                 throw std::runtime_error("Error parsing face element: vertex index. line: " + std::to_string(lineNb));
             vertexIndices.push_back(vIndex > 0 ? vIndex - 1 : geometryElemCounts[VERTEX_INX] + vIndex);
 
             // Check for texture coordinate index
-            if (vertexStream.peek() == '/') {
-                vertexStream >> slash;
+            if (iss.peek() == '/') {
+                iss >> slash;
                 
                 // Check if texture coordinates are provided
-                if (vertexStream.peek() != '/') {
-                    if (!(vertexStream >> vtIndex))
+                if (iss.peek() != '/') {
+                    if (!(iss >> vtIndex))
                         throw std::runtime_error("Error parsing face element: texture index. line: " + std::to_string(lineNb));
                     if (geometryElemCounts[TEX_INX] == 0)
                         throw std::runtime_error("Error parsing face element: texture index not defined. line: " + std::to_string(lineNb));
@@ -47,9 +48,9 @@ struct Face {
                 }
                 
                 // Check for normal index
-                if (vertexStream.peek() == '/') {
-                    vertexStream >> slash;
-                    if (!(vertexStream >> vnIndex))
+                if (iss.peek() == '/') {
+                    iss >> slash;
+                    if (!(iss >> vnIndex))
                         throw std::runtime_error("Error parsing face element: normal index. line: " + std::to_string(lineNb));
                     if (geometryElemCounts[NORMAL_INX] == 0)
                         throw std::runtime_error("Error parsing face element: normal index not defined. line: " + std::to_string(lineNb));
