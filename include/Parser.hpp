@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <fstream>
 
-#include "sharedParsing.hpp"
-#include "Object.hpp"
+#include "parsing/sharedParsing.hpp"
+#include "parsing/Object.hpp"
 
 namespace scop {
 
@@ -141,11 +141,8 @@ class Parser {
             return os;
         }
 
-
-
-
     private:
-        Parser() = delete;
+        Parser() {}
 
         std::unordered_map <std::string, Object> _objects;
         std::vector<std::string> _materialLibraries;
