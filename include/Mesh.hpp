@@ -46,7 +46,7 @@ class Mesh {
 
         void draw() const {
             glBindVertexArray(_vao);
-            glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
+            glDrawArrays(GL_TRIANGLES, 0, _vertexCount);
             glBindVertexArray(0);
         }
 
@@ -55,26 +55,32 @@ class Mesh {
                 for (auto const &face : group.second.faces) {
                     for (size_t i = 0; i < face.vertexCount; i++) {
                         MeshVertex meshVertex;
-                        std::cout << "hallo" << std::endl;
                         auto vertex = obj.getVertexByIndex(face.vertexIndices[i]);
-                        auto texCoord = obj.getTexCoordByIndex(face.textureIndices[i]);
-                        auto normal = obj.getNormalByIndex(face.normalIndices[i]);
+                        meshVertex.position = glm::vec4(vertex.x, vertex.y, vertex.z, vertex.w);
 
-                        if (vertex.has_value())
-                            meshVertex.position = glm::vec4(vertex.value().x, vertex.value().y, vertex.value().z, vertex.value().w);
-                        if (texCoord.has_value())
-                            meshVertex.texCoord = glm::vec3(texCoord.value().u, texCoord.value().v, texCoord.value().w);
-                        if (normal.has_value())
-                            meshVertex.normal = glm::vec3(normal.value().x, normal.value().y, normal.value().z);
+                        if (!face.textureIndices.empty()) {
+                            auto texCoord = obj.getTexCoordByIndex(face.textureIndices[i]);
+                            meshVertex.texCoord = glm::vec3(texCoord.u, texCoord.v, texCoord.w);
+                        }
+
+                        if (!face.normalIndices.empty()) {
+                            auto normal = obj.getNormalByIndex(face.normalIndices[i]);
+                            meshVertex.normal = glm::vec3(normal.x, normal.y, normal.z);
+                        }
+
                         _vertices.push_back(meshVertex);
                     }
                 }
             }
+            _vertexCount = _vertices.size();
         }
+
+        GLuint getVao() const { return _vao; }
 
     private:
         GLuint _vao, _vbo;
         std::vector<MeshVertex> _vertices;
+        size_t _vertexCount;
 
         
 };

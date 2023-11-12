@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <array>
+#include <tuple>
+#include <optional>
 
 namespace scop {
 

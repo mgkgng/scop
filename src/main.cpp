@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     try {
         parser = std::make_unique<scop::Parser>(argv[1]);
         std::cout << "Parsing done successfully" << std::endl;
+        // std::cout << *parser << std::endl;
     } catch (std::exception const &e) {
         std::cerr << "Failed to parse file: " << argv[1] << std::endl;
         std::cerr << e.what() << std::endl;
@@ -54,20 +55,16 @@ int main(int argc, char** argv) {
     }
 
     auto objects = parser->getObjects();
-
-    auto mesh = std::make_unique<scop::Mesh>(objects["default"]);
-    // for (auto const &o : objects) {
-    //     // std::cout << o.second << std::endl;
-    //     auto mesh = std::make_unique<scop::Mesh>(o.second);
-    // }
+    auto mesh = std::make_unique<scop::Mesh>(objects["Cube"]);
 
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
         shader->use();
-        mesh->draw();
 
-        // Render your 3D objects here
+        glBindVertexArray(mesh->getVao());
+
+        mesh->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

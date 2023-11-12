@@ -63,23 +63,9 @@ struct Object {
         return os;
     }
 
-    std::optional<scop::Vertex> getVertexByIndex(size_t index) const {
-        if (index < _vertices.size())
-            return _vertices[index];
-        return std::nullopt;
-    }
-
-    std::optional<scop::TexCoord> getTexCoordByIndex(size_t index) const {
-        if (index < _texCoords.size())
-            return _texCoords[index];
-        return std::nullopt;
-    }
-
-    std::optional<scop::Normal> getNormalByIndex(size_t index) const {
-        if (index < _normals.size())
-            return _normals[index];
-        return std::nullopt;
-    }
+    scop::Vertex getVertexByIndex(size_t index) const { return _vertices[index]; }
+    scop::TexCoord getTexCoordByIndex(size_t index) const { return _texCoords[index]; }
+    scop::Normal getNormalByIndex(size_t index) const { return _normals[index]; }
 
     private:
         Group *currentGroup = nullptr;
