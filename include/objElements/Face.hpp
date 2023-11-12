@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sharedParsing.hpp"
+#include "obj.hpp"
 
 #include <vector>
 #include <array>
@@ -9,6 +9,7 @@ namespace scop {
 
 struct Face {
     std::vector<int> vertexIndices, textureIndices, normalIndices;
+    size_t vertexCount = 0;
     std::string materialName;
     int smoothingGroup;
 
@@ -82,7 +83,8 @@ struct Face {
         }
 
         if (vertexIndices.empty())
-            throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb));
+            throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb)); 
+        vertexCount = vertexIndices.size();
     }
 
     void setMaterialName(std::string const &name) { materialName = name; }

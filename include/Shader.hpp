@@ -20,6 +20,7 @@ class Shader {
             compileShader(vertexShader, vertexSource.c_str());
             compileShader(fragmentShader, fragmentSource.c_str());
 
+
             _id = glCreateProgram();
             glAttachShader(_id, vertexShader);
             glAttachShader(_id, fragmentShader);

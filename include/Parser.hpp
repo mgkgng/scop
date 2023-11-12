@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include <fstream>
 
-#include "parsing/sharedParsing.hpp"
-#include "parsing/Object.hpp"
+#include "objElements/Object.hpp"
 
 namespace scop {
 
@@ -55,9 +54,9 @@ class Parser {
 
                     case FACE:
                         if (!faceDef) {
-                            geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
-                            geometryElemCounts[TEX_INX] = currentObject->texCoords.size();
-                            geometryElemCounts[NORMAL_INX] = currentObject->normals.size();
+                            geometryElemCounts[VERTEX_INX] = currentObject->_vertices.size();
+                            geometryElemCounts[TEX_INX] = currentObject->_texCoords.size();
+                            geometryElemCounts[NORMAL_INX] = currentObject->_normals.size();
                         }
                         checkElemOrder(FACE_TYPE, vertexDef, faceDef, lineDef, lineNb);
                         checkObjExist();
@@ -66,7 +65,7 @@ class Parser {
 
                     case LINE:
                         if (!lineDef)
-                            geometryElemCounts[VERTEX_INX] = currentObject->vertices.size();
+                            geometryElemCounts[VERTEX_INX] = currentObject->_vertices.size();
                         checkElemOrder(LINE_TYPE, vertexDef, faceDef, lineDef, lineNb);
                         checkObjExist();
                         currentObject->addLine(tokens, lineNb, geometryElemCounts[VERTEX_INX]);
@@ -131,6 +130,8 @@ class Parser {
             }
         }
 
+        std::unordered_map<std::string, Object> const &getObjects() const { return _objects; }
+
         friend std::ostream& operator<<(std::ostream& os, const Parser& parser) {
             for (auto const &m : parser._materialLibraries) {
                 os << "mtllib " << m << std::endl;
@@ -180,11 +181,11 @@ class Parser {
             checkElemOrder(VERTEX_TYPE, vertexDef, faceDef, lineDef, lineNb);
             checkObjExist();
             if (elemType == VERTEX)
-                currentObject->vertices.emplace_back(tokens, lineNb);
+                currentObject->_vertices.emplace_back(tokens, lineNb);
             else if (elemType == TEXCOORD)
-                currentObject->texCoords.emplace_back(tokens, lineNb);
+                currentObject->_texCoords.emplace_back(tokens, lineNb);
             else
-                currentObject->normals.emplace_back(tokens, lineNb);
+                currentObject->_normals.emplace_back(tokens, lineNb);
         }
 
         Object *currentObject = nullptr;

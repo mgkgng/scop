@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sharedParsing.hpp"
+#include "obj.hpp"
 
 namespace scop {
 
