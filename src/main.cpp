@@ -3,15 +3,19 @@
 #include <iostream>
 #include <memory>
 
+#include "App.hpp"
 #include "Parser.hpp"
 #include "Shader.hpp"
 #include "Mesh.hpp"
+#include "Transform.hpp"
 
 int main(int argc, char** argv) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <obj file>" << std::endl;
         return -1;
     }
+
+    scop::App app;
     
     std::unique_ptr<scop::Parser> parser;
     std::unique_ptr<scop::Shader> shader;
@@ -57,10 +61,21 @@ int main(int argc, char** argv) {
     auto objects = parser->getObjects();
     auto mesh = std::make_unique<scop::Mesh>(objects["Cube"]);
 
+    scop::Transform transform;
+
+    float angle = 0.0f;
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+        angle += 0.05f;
+        if (angle > 360.0f) angle = 0.0f;
+
+        transform.updateModelMatrix(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, angle, angle), glm::vec3(1.0f, 1.0f, 1.0f));
+
         shader->use();
+        shader->setMat4("model", transform.model);
+        shader->setMat4("view", transform.view);
+        shader->setMat4("projection", transform.projection);
 
         glBindVertexArray(mesh->getVao());
 

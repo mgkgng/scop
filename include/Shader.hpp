@@ -6,6 +6,9 @@
 #include <iostream>
 #include <sstream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace scop {
 
 class Shader {
@@ -19,7 +22,6 @@ class Shader {
 
             compileShader(vertexShader, vertexSource.c_str());
             compileShader(fragmentShader, fragmentSource.c_str());
-
 
             _id = glCreateProgram();
             glAttachShader(_id, vertexShader);
@@ -41,6 +43,10 @@ class Shader {
 
         void use() { glUseProgram(_id); }
         GLuint getId() const { return _id; }
+
+        void setMat4(const std::string &name, const glm::mat4 &mat) const {
+            glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+        }
     private:
         GLuint _id;
 
