@@ -15,8 +15,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    scop::App app;
-    
     std::unique_ptr<scop::Parser> parser;
     std::unique_ptr<scop::Shader> shader;
 
@@ -29,25 +27,9 @@ int main(int argc, char** argv) {
         std::cerr << e.what() << std::endl;
         return 1;
     }
-    
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "SCOP", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
-        return -1;
-    }
+    scop::App app;
+    app.init();
 
     try {
         shader = std::make_unique<scop::Shader>("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
@@ -64,9 +46,8 @@ int main(int argc, char** argv) {
     scop::Transform transform;
 
     float angle = 0.0f;
-    while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+
+    app.run([&]() {    
         angle += 0.05f;
         if (angle > 360.0f) angle = 0.0f;
 
@@ -80,11 +61,7 @@ int main(int argc, char** argv) {
         glBindVertexArray(mesh->getVao());
 
         mesh->draw();
+    });
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
     return 0;
 }
