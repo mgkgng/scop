@@ -59,15 +59,22 @@ class App {
         }
 
         static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-            // Handle mouse button events here
+            (void) window;
+            std::cout << "button: " << button << std::endl;
+            std::cout << "action: " << action << std::endl;
+            std::cout << "mods: " << mods << std::endl;
         }
 
         static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-            // Handle cursor position events here
+            (void) window;
+            (void) xpos;
+            (void) ypos;
         }
 
         static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-            // Handle scroll events here
+            (void) window;
+            (void) xoffset;
+            (void) yoffset;
         }
 
     private:

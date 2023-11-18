@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "objElements/Object.hpp"
+#include "objElements/MTL.hpp"
 
 namespace scop {
 
@@ -109,7 +110,7 @@ class Parser {
                             std::cerr << "Invalid material library format on line " << lineNb << std::endl;
                             throw std::exception();
                         }
-                        _materialLibraries.push_back(tokens[1]);
+                        _materialLibraries.emplace_back(path, tokens[1]);
                         break;
 
                     case USEMTL:
@@ -117,6 +118,11 @@ class Parser {
                             std::cerr << "Invalid material name format on line " << lineNb << std::endl;
                             throw std::exception();
                         }
+                        if (!materialExists(tokens[1])) {
+                            std::cerr << "Material " << tokens[1] << " does not exist on line " << lineNb << std::endl;
+                            throw std::exception();
+                        }
+
                         currentMaterial = tokens[1];
                         break;
                     case UNKNOWN:
@@ -146,7 +152,7 @@ class Parser {
         Parser() {}
 
         std::unordered_map <std::string, Object> _objects;
-        std::vector<std::string> _materialLibraries;
+        std::vector<scop::MTL> _materialLibraries;
 
         void checkObjExist() {
             if (currentObject == nullptr) {
@@ -186,6 +192,14 @@ class Parser {
                 currentObject->_texCoords.emplace_back(tokens, lineNb);
             else
                 currentObject->_normals.emplace_back(tokens, lineNb);
+        }
+
+        bool materialExists(std::string const &name) const {
+            for (auto const &m : _materialLibraries) {
+                if (m._materials.find(name) != m._materials.end())
+                    return true;
+            }
+            return false;
         }
 
         Object *currentObject = nullptr;

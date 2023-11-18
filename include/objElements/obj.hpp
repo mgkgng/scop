@@ -1,9 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include <sstream>
-#include <vector>
 #include <unordered_map>
+
+#include "parsingUtils.hpp"
 
 enum ElemType {
     VERTEX,
@@ -59,23 +59,3 @@ enum VertexIndex { VERTEX_INX, TEX_INX, NORMAL_INX };
 //         │
 //         ├── Material Name (usemtl)
 //         └── Smoothing Group (s)
-
-std::vector<std::string> split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        if (!token.empty()) { // Optionally skip empty tokens
-            tokens.push_back(token);
-        }
-    }
-    return tokens;
-}
-
-bool isFloat(const std::string& s) {
-    std::istringstream iss(s);
-    float f;
-    iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
-    // Check the entire string was consumed and if either failbit or badbit is set
-    return iss.eof() && !iss.fail();
-}
