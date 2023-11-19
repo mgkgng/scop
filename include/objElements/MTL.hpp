@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "material.hpp"
+#include "Material.hpp"
 
 namespace scop {
 
@@ -45,7 +45,7 @@ struct MTL {
             switch (eType) {
                 case NEW_MAT:
                     if (tokens.size() != 2) {
-                        std::cerr << "Invalid material name format on line " << lineNb << std::endl;
+                        std::cerr << "Invalid material name: " << lineNb << std::endl;
                         throw std::exception();
                     }
                     _materials.emplace(tokens[1], tokens[1]);
@@ -55,39 +55,48 @@ struct MTL {
                 case AMBIENT:
                 case DIFFUSE:
                 case SPECULAR:
+                case TRANSMISSION_FILTER:
                     if (_currentMaterial == nullptr) {
                         std::cerr << "No material defined on line " << lineNb << std::endl;
                         throw std::exception();
                     }
-                    if (!checkElemSize(eType, tokens.size(), lineNb))
+                    if (!checkElemValid(eType, tokens, lineNb))
                         throw std::exception();
                     _currentMaterial->addRGB(eType, tokens, lineNb);
                     break;
 
                 case SPECULAR_EXPONENT:
+                case DISSOLVE:
+                case TRANSPARENT:
+                case OPTICAL_DENSITY:
+                case ILLUMINATION:
                     if (_currentMaterial == nullptr) {
                         std::cerr << "No material defined on line " << lineNb << std::endl;
                         throw std::exception();
                     }
-                    if (!checkElemSize(eType, tokens.size(), lineNb))
+                    if (!checkElemValid(eType, tokens, lineNb))
                         throw std::exception();
                     _currentMaterial->addValue(eType, tokens, lineNb);
                     break;
 
 
-                case UNKNOWN:
+                case UNKNOWN_:
                     std::cerr << "Unknown prefix: " << tokens[0] << " on line " << lineNb << std::endl;
                     throw std::exception();
                     break;
-
             }
-
             lineNb++;
         }
 
     }
 
     ~MTL() {}
+
+    friend std::ostream& operator<<(std::ostream& os, const MTL& mtl) {
+        for (auto& [name, mat] : mtl._materials)
+            os << mat << std::endl;
+        return os;
+    }
 
 };
 

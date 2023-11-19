@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
+#include <functional>
 
 #include "parsingUtils.hpp"
 
@@ -15,17 +16,8 @@ enum MtlElemType {
     DISSOLVE,
     TRANSPARENT,
     TRANSMISSION_FILTER,
+    OPTICAL_DENSITY,
     ILLUMINATION,
-    AMBIENT_TEXTURE,
-    DIFFUSE_TEXTURE,
-    SPECULAR_TEXTURE,
-    SPECULAR_EXPONENT_TEXTURE,
-    TRANSMISSION_FILTER_TEXTURE,
-    BUMP_TEXTURE,
-    DISPLACEMENT_TEXTURE,
-    DECAL_TEXTURE,
-    REFLECTION_TEXTURE,
-    REFRACTION_TEXTURE,
     UNKNOWN_
 };
 
@@ -38,26 +30,9 @@ const std::unordered_map<std::string, MtlElemType> mtlElemMap = {
     {"d", DISSOLVE},
     {"Tr", TRANSPARENT},
     {"Tf", TRANSMISSION_FILTER},
-    {"illum", ILLUMINATION},
-    {"map_Ka", AMBIENT_TEXTURE},
-    {"map_Kd", DIFFUSE_TEXTURE},
-    {"map_Ks", SPECULAR_TEXTURE},
-    {"map_Ns", SPECULAR_EXPONENT_TEXTURE},
-    {"map_Tf", TRANSMISSION_FILTER_TEXTURE},
-    {"map_bump", BUMP_TEXTURE},
-    {"map_d", DISPLACEMENT_TEXTURE},
-    {"decal", DECAL_TEXTURE},
-    {"refl", REFLECTION_TEXTURE},
-    {"refr", REFRACTION_TEXTURE}
+    {"Ni", OPTICAL_DENSITY},
+    {"illum", ILLUMINATION}
 };
-
-MtlElemType getMtlElemType(const std::string& prefix) {
-    auto it = mtlElemMap.find(prefix);
-    if (it != mtlElemMap.end()) {
-        return it->second;
-    }
-    return UNKNOWN_;
-}
 
 const std::unordered_map<MtlElemType, size_t> mtlElemSize = {
     {NEW_MAT, 1},
@@ -68,70 +43,59 @@ const std::unordered_map<MtlElemType, size_t> mtlElemSize = {
     {DISSOLVE, 1},
     {TRANSPARENT, 1},
     {TRANSMISSION_FILTER, 3},
-    {ILLUMINATION, 1},
-    {AMBIENT_TEXTURE, 1},
-    {DIFFUSE_TEXTURE, 1},
-    {SPECULAR_TEXTURE, 1},
-    {SPECULAR_EXPONENT_TEXTURE, 1},
-    {TRANSMISSION_FILTER_TEXTURE, 1},
-    {BUMP_TEXTURE, 1},
-    {DISPLACEMENT_TEXTURE, 1},
-    {DECAL_TEXTURE, 1},
-    {REFLECTION_TEXTURE, 1},
-    {REFRACTION_TEXTURE, 1}
-};
-
-struct Bound {
-    float _lower, _upper;
-
-    Bound(float lower, float upper) : _lower(lower), _upper(upper) {}
-    ~Bound() {}
-
-    bool isInside(float value) const {
-        return value >= _lower && value <= _upper;
-    }
+    {OPTICAL_DENSITY, 1},
+    {ILLUMINATION, 1}
 };
 
 const std::unordered_map<MtlElemType, Bound> mtlElemBounds = {
-    {AMBIENT, Bound(0, 1)},
-    {DIFFUSE, Bound(0, 1)},
-    {SPECULAR, Bound(0, 1)},
-    {SPECULAR_EXPONENT, Bound(0, 1000)},
-    {DISSOLVE, Bound(0, 1)},
-    {TRANSPARENT, Bound(0, 1)},
-    {TRANSMISSION_FILTER, Bound(0, 1)},
-    {ILLUMINATION, Bound(0, 10)},
-    {AMBIENT_TEXTURE, Bound(0, 0)},
-    {DIFFUSE_TEXTURE, Bound(0, 0)},
-    {SPECULAR_TEXTURE, Bound(0, 0)},
-    {SPECULAR_EXPONENT_TEXTURE, Bound(0, 0)},
-    {TRANSMISSION_FILTER_TEXTURE, Bound(0, 0)},
-    {BUMP_TEXTURE, Bound(0, 0)},
-    {DISPLACEMENT_TEXTURE, Bound(0, 0)},
-    {DECAL_TEXTURE, Bound(0, 0)},
-    {REFLECTION_TEXTURE, Bound(0, 0)},
-    {REFRACTION_TEXTURE, Bound(0, 0)}
+    {AMBIENT, Bound(0.f, 1.f)},
+    {DIFFUSE, Bound(0.f, 1.f)},
+    {SPECULAR, Bound(0.f, 1.f)},
+    {SPECULAR_EXPONENT, Bound(0.f, 1000.f)},
+    {DISSOLVE, Bound(0.f, 1.f)},
+    {TRANSPARENT, Bound(0.f, 1.f)},
+    {TRANSMISSION_FILTER, Bound(0.f, 1.f)}, // Transmission filter in CIE XYZ or with spectral curve file not supported
+    {OPTICAL_DENSITY, Bound(0.001f, 10.f)},
+    {ILLUMINATION, Bound(0, 10)}
 };
 
-bool checkElemSize(MtlElemType elemType, size_t size, size_t lineNb) {
-    if (size != mtlElemSize.at(elemType)) {
+const std::unordered_map<MtlElemType, std::function<std::pair<bool, IntOrFloat>(std::string)>> mtlElemCheckTypeFuncs = {
+    {NEW_MAT, nullptr},
+    {AMBIENT, isFloat},
+    {DIFFUSE, isFloat},
+    {SPECULAR, isFloat},
+    {SPECULAR_EXPONENT, isFloat},
+    {DISSOLVE, isFloat},
+    {TRANSPARENT, isFloat},
+    {TRANSMISSION_FILTER, isFloat},
+    {OPTICAL_DENSITY, isFloat},
+    {ILLUMINATION, isInteger}
+};
+
+MtlElemType getMtlElemType(const std::string& prefix) {
+    auto it = mtlElemMap.find(prefix);
+    if (it != mtlElemMap.end())
+        return it->second;
+    return UNKNOWN_;
+}
+
+bool checkElemValid(MtlElemType elemType, std::vector<std::string> &tokens, size_t lineNb) {
+    if (tokens.size() - 1 != mtlElemSize.at(elemType)) {
         std::cerr << "Invalid number of arguments for " << elemType << ": " << lineNb << std::endl;
         return false;
     }
-    return true;
-}
 
-bool checkElemBounds(MtlElemType elemType, float value, size_t lineNb) {
-    if (!mtlElemBounds.at(elemType).isInside(value)) {
-        std::cerr << "Invalid value for " << elemType << ": " << lineNb << std::endl;
-        return false;
-    }
-    return true;
-}
+    if (mtlElemCheckTypeFuncs.at(elemType) == nullptr)
+        return true;
 
-bool checkElemBounds(MtlElemType elemType, std::vector<float> &values, size_t lineNb) {
-    for (auto &value : values) {
-        if (!mtlElemBounds.at(elemType).isInside(value)) {
+    for (size_t i = 1; i < tokens.size(); i++) {
+        auto res = mtlElemCheckTypeFuncs.at(elemType)(tokens[i]);
+        if (!res.first) {
+            std::cerr << "Invalid value for " << elemType << ": " << lineNb << std::endl;
+            return false;
+        }
+
+        if (!mtlElemBounds.at(elemType).isInside(res.second)) {
             std::cerr << "Invalid value for " << elemType << ": " << lineNb << std::endl;
             return false;
         }

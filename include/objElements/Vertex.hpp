@@ -21,7 +21,7 @@ struct Vertex {
         bool hasWeight = tokens.size() == 5;
 
         for (int i = 1; i < 4 + hasWeight; i++) {
-            if (!isFloat(tokens[i])) {
+            if (!isFloat(tokens[i]).first) {
                 std::cerr << "Error: Failed to parse vertex coordinates at line " << lineNb << ".\n";
                 throw std::runtime_error("Parsing error: vertex coordinates.");
             }
