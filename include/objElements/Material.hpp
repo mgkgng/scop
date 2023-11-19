@@ -82,6 +82,7 @@ struct Material {
         os << "Ks " << m._specular.r << " " << m._specular.g << " " << m._specular.b << "\n";
         os << "Ns " << m._specularExponent << "\n";
         os << "d " << m._dissolve << "\n";
+        os << "Ni " << m._opticalDensity << "\n";
         os << "illum " << m._illumination << "\n";
         return os;
     }

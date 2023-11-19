@@ -24,10 +24,6 @@ struct MTL {
 
         std::string line;
         size_t lineNb = 1;
-        bool vertexDef = false, faceDef = false, lineDef = false;
-        std::array<size_t, 3> geometryElemCounts{0, 0, 0};
-        std::string currentMaterial = "";
-        int currentSmoothingGroup = 0;
 
         while (std::getline(file, line)) {
             if (line.empty() || line[0] == '#') {

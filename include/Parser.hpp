@@ -4,9 +4,9 @@
 #include <array>
 #include <unordered_map>
 #include <fstream>
+#include <optional>
 
 #include "objElements/Object.hpp"
-#include "objElements/MTL.hpp"
 
 namespace scop {
 
@@ -24,8 +24,9 @@ class Parser {
             size_t lineNb = 1;
             bool vertexDef = false, faceDef = false, lineDef = false;
             std::array<size_t, 3> geometryElemCounts{0, 0, 0};
-            std::string currentMaterial = "";
+            Material *currentMaterial = nullptr;
             int currentSmoothingGroup = 0;
+            std::optional<Material *> mat;
 
             while (std::getline(file, line)) {
                 if (line.empty() || line[0] == '#') {
@@ -118,12 +119,12 @@ class Parser {
                             std::cerr << "Invalid material name format on line " << lineNb << std::endl;
                             throw std::exception();
                         }
-                        if (!materialExists(tokens[1])) {
+                        mat = materialExists(tokens[1]);
+                        if (!mat.has_value()) {
                             std::cerr << "Material " << tokens[1] << " does not exist on line " << lineNb << std::endl;
                             throw std::exception();
                         }
-
-                        currentMaterial = tokens[1];
+                        currentMaterial = mat.value();
                         break;
                     case UNKNOWN:
                         std::cerr << "Unknown prefix: " << tokens[0] << " on line " << lineNb << std::endl;
@@ -144,6 +145,9 @@ class Parser {
             }
             for (auto const &o : parser._objects) {
                 os << o.second << std::endl;
+            }
+            for (auto const &m : parser._materialLibraries) {
+                os << m << std::endl;
             }
             return os;
         }
@@ -194,12 +198,12 @@ class Parser {
                 currentObject->_normals.emplace_back(tokens, lineNb);
         }
 
-        bool materialExists(std::string const &name) const {
-            for (auto const &m : _materialLibraries) {
+        std::optional<Material *> materialExists(std::string const &name) {
+            for (auto &m : _materialLibraries) {
                 if (m._materials.find(name) != m._materials.end())
-                    return true;
+                    return &m._materials.at(name);
             }
-            return false;
+            return std::nullopt;
         }
 
         Object *currentObject = nullptr;

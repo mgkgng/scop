@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     try {
         parser = std::make_unique<scop::Parser>(argv[1]);
         std::cout << "Parsing done successfully" << std::endl;
-        // std::cout << *parser << std::endl;
+        std::cout << *parser << std::endl;
     } catch (std::exception const &e) {
         std::cerr << "Failed to parse file: " << argv[1] << std::endl;
         std::cerr << e.what() << std::endl;
@@ -54,6 +54,11 @@ int main(int argc, char** argv) {
         transform.updateModelMatrix(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, angle, angle), glm::vec3(1.0f, 1.0f, 1.0f));
 
         shader->use();
+        // shader.setVec3("material.ambient", glm::vec3(material._ambient.r, material._ambient.g, material._ambient.b));
+        // shader.setVec3("material.diffuse", glm::vec3(material._diffuse.r, material._diffuse.g, material._diffuse.b));
+        // shader.setVec3("material.specular", glm::vec3(material._specular.r, material._specular.g, material._specular.b));
+        // shader.setFloat("material.shininess", material._specularExponent);
+
         shader->setMat4("model", transform.model);
         shader->setMat4("view", transform.view);
         shader->setMat4("projection", transform.projection);

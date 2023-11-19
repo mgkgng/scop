@@ -26,12 +26,12 @@ struct Object {
     void addVertex(std::vector<std::string> const &tokens, size_t &lineNb) { _vertices.emplace_back(tokens, lineNb); }
     void addTexCoord(std::vector<std::string> const &tokens, size_t &lineNb) { _texCoords.emplace_back(tokens, lineNb); }
     void addNormal(std::vector<std::string> const &tokens, size_t &lineNb) { _normals.emplace_back(tokens, lineNb); }
-    void addFace(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &materialName, int &smoothingGroup) {
+    void addFace(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, Material *mat, int &smoothingGroup) {
         if (currentGroup == nullptr) {
             _groups.emplace("default", Group(""));
             currentGroup = &_groups[""];
         }
-        currentGroup->addFace(tokens, lineNb, geometryElemCounts, materialName, smoothingGroup);
+        currentGroup->addFace(tokens, lineNb, geometryElemCounts, mat, smoothingGroup);
     }
     void addLine(std::vector<std::string> const &tokens, size_t &lineNb, size_t &vertexCount) {
         if (currentGroup == nullptr) {

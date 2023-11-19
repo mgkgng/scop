@@ -14,8 +14,8 @@ struct Group {
     Group() = default;
     Group(std::string const &name) : name(name) {}
 
-    void addFace(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &materialName, int &smoothingGroup) {
-        faces.emplace_back(tokens, lineNb, geometryElemCounts, materialName, smoothingGroup);
+    void addFace(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, Material *mat, int &smoothingGroup) {
+        faces.emplace_back(tokens, lineNb, geometryElemCounts, mat, smoothingGroup);
     }
 
     void addLine(std::vector<std::string> const &tokens, size_t &lineNb, size_t &vertexCount) {
@@ -29,8 +29,8 @@ struct Group {
         std::string currMatName = "";
         int currSmoothingGroup = -1;
         for (const auto& f : g.faces) {
-            if (f.materialName != currMatName) {
-                currMatName = f.materialName;
+            if (f.material->_name != currMatName) {
+                currMatName = f.material->_name;
                 os << "usemtl " << currMatName << std::endl;
             }
             if (f.smoothingGroup != currSmoothingGroup) {

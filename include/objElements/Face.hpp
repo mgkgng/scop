@@ -7,18 +7,20 @@
 #include <tuple>
 #include <optional>
 
+#include "objElements/MTL.hpp"
+
 namespace scop {
 
 struct Face {
     std::vector<int> vertexIndices, textureIndices, normalIndices;
     size_t vertexCount = 0;
-    std::string materialName;
+    Material *material = nullptr;
     int smoothingGroup;
 
     enum VertexType { VERTEX_ONLY, VERTEX_TEX, VERTEX_NORMAL, VERTEX_TEX_NORMAL };
 
-    Face(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, std::string &matName, int &sGroup) 
-        : materialName(matName), smoothingGroup(sGroup) {
+    Face(std::vector<std::string> const &tokens, size_t &lineNb, std::array<size_t, 3> &geometryElemCounts, Material *mat, int &sGroup) 
+        : material(mat), smoothingGroup(sGroup) {
         if (geometryElemCounts[VERTEX_INX] == 0)
             throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb));
 
@@ -88,9 +90,6 @@ struct Face {
             throw std::runtime_error("Error parsing face element: vertex index not defined. line: " + std::to_string(lineNb)); 
         vertexCount = vertexIndices.size();
     }
-
-    void setMaterialName(std::string const &name) { materialName = name; }
-    void setSmoothingGroup(unsigned int group) { smoothingGroup = group; }
 
     friend std::ostream& operator<<(std::ostream& os, const Face& f) {
         os << "f";
