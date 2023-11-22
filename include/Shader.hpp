@@ -9,8 +9,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace scop {
-
 class Shader {
     public:
         Shader(const char *vertexPath, const char *fragmentPath) {
@@ -38,6 +36,8 @@ class Shader {
 
             glDeleteShader(vertexShader);
             glDeleteShader(fragmentShader);
+
+            std::cout << "Shader created successfully" << std::endl;
         }
         ~Shader() { glDeleteProgram(_id); }
 
@@ -86,5 +86,3 @@ class Shader {
             }
         }
 };
-
-}

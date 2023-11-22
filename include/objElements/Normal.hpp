@@ -2,8 +2,6 @@
 
 #include "obj.hpp"
 
-namespace scop {
-
 struct Normal {
     float x, y, z;
 
@@ -22,5 +20,3 @@ struct Normal {
         return os;
     }
 };
-
-}

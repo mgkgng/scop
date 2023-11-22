@@ -9,8 +9,6 @@
 
 #include "objElements/MTL.hpp"
 
-namespace scop {
-
 struct Face {
     std::vector<int> vertexIndices, textureIndices, normalIndices;
     size_t vertexCount = 0;
@@ -111,5 +109,3 @@ struct Face {
         return os;
     }
 };
-
-}

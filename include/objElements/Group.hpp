@@ -4,8 +4,6 @@
 #include "Face.hpp"
 #include "Line.hpp"
 
-namespace scop {
-
 struct Group {
     std::string name;
     std::vector<Face> faces;
@@ -42,5 +40,3 @@ struct Group {
         return os;
     }
 };
-
-}

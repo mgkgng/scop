@@ -2,8 +2,6 @@
 
 #include "obj.hpp"
 
-namespace scop {
-
 struct Line {
     std::vector<size_t> vertexIndices;
 
@@ -30,5 +28,3 @@ struct Line {
     }
 
 };
-
-}

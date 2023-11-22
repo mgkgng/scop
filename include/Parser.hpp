@@ -8,8 +8,6 @@
 
 #include "objElements/Object.hpp"
 
-namespace scop {
-
 class Parser {
 
     public:
@@ -156,7 +154,7 @@ class Parser {
         Parser() {}
 
         std::unordered_map <std::string, Object> _objects;
-        std::vector<scop::MTL> _materialLibraries;
+        std::vector<MTL> _materialLibraries;
 
         void checkObjExist() {
             if (currentObject == nullptr) {
@@ -208,5 +206,3 @@ class Parser {
 
         Object *currentObject = nullptr;
 };
-
-}

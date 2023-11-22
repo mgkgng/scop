@@ -7,18 +7,13 @@
 #include <vector>
 
 #include "Parser.hpp"
-
-namespace scop {
-
-struct MeshVertex {
-    glm::vec4 position;
-    glm::vec3 normal;
-    glm::vec3 texCoord;
-};
+#include "MeshVertex.hpp"
 
 class Mesh {
     public:
-        Mesh(scop::Object const &obj) {
+        Mesh(Object const &obj) {
+            std::cout << "Creating mesh..." << std::endl;
+            
             parseObj(obj);
 
             glGenVertexArrays(1, &_vao);
@@ -38,6 +33,8 @@ class Mesh {
             glEnableVertexAttribArray(2);
 
             glBindVertexArray(0);
+
+            std::cout << "Mesh created successfully" << std::endl;
         }
         ~Mesh() {
             glDeleteVertexArrays(1, &_vao);
@@ -50,7 +47,7 @@ class Mesh {
             glBindVertexArray(0);
         }
 
-        void parseObj(scop::Object const &obj) {
+        void parseObj(Object const &obj) {
             for (auto const &group : obj._groups) {
                 for (auto const &face : group.second.faces) {
                     for (size_t i = 0; i < face.vertexCount; i++) {
@@ -76,6 +73,7 @@ class Mesh {
         }
 
         GLuint getVao() const { return _vao; }
+        std::vector<MeshVertex> const &getVertices() const { return _vertices; }
 
     private:
         GLuint _vao, _vbo;
@@ -84,5 +82,3 @@ class Mesh {
 
         
 };
-
-}

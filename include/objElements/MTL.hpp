@@ -4,8 +4,6 @@
 
 #include "Material.hpp"
 
-namespace scop {
-
 struct MTL {
     std::unordered_map<std::string, Material> _materials;
     Material *_currentMaterial = nullptr;
@@ -95,5 +93,3 @@ struct MTL {
     }
 
 };
-
-}

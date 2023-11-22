@@ -2,8 +2,6 @@
 
 #include "obj.hpp"
 
-namespace scop {
-
 struct Vertex {
     float x, y, z, w = 1.0f;
 
@@ -41,5 +39,3 @@ struct Vertex {
         return os;
     }
 };
-
-}

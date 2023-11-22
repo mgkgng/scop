@@ -2,8 +2,6 @@
 
 #include "obj.hpp"
 
-namespace scop {
-
 struct TexCoord {
     float u, v = 0.f, w = 0.f;
  
@@ -22,5 +20,3 @@ struct TexCoord {
         return os;
     }
 };
-
-}

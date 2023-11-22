@@ -9,8 +9,6 @@
 #include <unordered_map>
 #include <optional>
 
-namespace scop {
-
 struct Object {
     std::string _name;
 
@@ -63,13 +61,11 @@ struct Object {
         return os;
     }
 
-    scop::Vertex getVertexByIndex(size_t index) const { return _vertices[index]; }
-    scop::TexCoord getTexCoordByIndex(size_t index) const { return _texCoords[index]; }
-    scop::Normal getNormalByIndex(size_t index) const { return _normals[index]; }
+    Vertex getVertexByIndex(size_t index) const { return _vertices[index]; }
+    TexCoord getTexCoordByIndex(size_t index) const { return _texCoords[index]; }
+    Normal getNormalByIndex(size_t index) const { return _normals[index]; }
 
     private:
         Group *currentGroup = nullptr;
  
 };
-
-}
