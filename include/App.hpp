@@ -10,6 +10,9 @@
 #include "Mesh.hpp"
 #include "Parser.hpp"
 
+#define WIDTH 1280.0f
+#define HEIGHT 720.0f
+
 class App {
     public:
         bool isDragging = false;
@@ -20,7 +23,7 @@ class App {
         App(const std::unordered_map<std::string, Object> &objects) {
             init();
             _mesh = std::make_unique<Mesh>(objects.at("Cube"));
-            _transform = std::make_unique<Transform>(_mesh->getVertices());
+            _transform = std::make_unique<Transform>(WIDTH, HEIGHT);
             std::cout << "App created successfully" << std::endl;
         }
         ~App() { glfwTerminate(); }
@@ -31,7 +34,7 @@ class App {
                 exit(1);
             }
 
-            _window = glfwCreateWindow(960, 640, "SCOP", nullptr, nullptr);
+            _window = glfwCreateWindow(WIDTH, HEIGHT, "SCOP", nullptr, nullptr);
             if (!_window) {
                 std::cerr << "Failed to create GLFW window" << std::endl;
                 glfwTerminate();
@@ -94,7 +97,7 @@ class App {
             app->lastY = ypos;
 
             if (app->isDragging)
-                app->rotateObject(deltaX, deltaY);
+                app->moveCamera(deltaX, deltaY);
         }
 
         static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -106,32 +109,19 @@ class App {
         }
 
         void handleZoom(double yoffset) {
-            // Adjust FOV or camera position here
-            // Example: Change FOV
-            float zoomSensitivity = -0.1f; // Adjust this value as needed
-            float newFOV = _transform->fov + static_cast<float>(yoffset) * zoomSensitivity;
-            std::cout << "New FOV: " << newFOV << std::endl;
-
-            // Clamp FOV to a range (e.g., between 20 and 90 degrees)
-            newFOV = std::max(20.0f, std::min(90.0f, newFOV));
-
-            _transform->setFOV(newFOV);
+            float dz = yoffset * 0.1f;
+        
+            _transform->modelMat.move(0.0f, 0.0f, dz);
         }
 
-        void rotateObject(double deltaX, double deltaY) {
-            // Sensitivity factor to control rotation speed
-            const float sensitivity = 0.1f;
+        void moveCamera(double deltaX, double deltaY) {
+            const float sensitivity = 0.005f;
 
             float angleX = static_cast<float>(deltaY) * sensitivity;
             float angleY = static_cast<float>(deltaX) * sensitivity;
 
-            glm::vec3 currentRotation = _transform->rotation;
-            currentRotation.x += angleX;
-            currentRotation.y += angleY;
-
-            currentRotation.x = std::max(std::min(currentRotation.x, 90.0f), -90.0f);
-
-            _transform->updateModelMatrix(glm::vec3(0.0f, 0.0f, 0.0f), currentRotation, glm::vec3(1.0f, 1.0f, 1.0f));
+            _transform->modelMat.rotate(angleY, 0.0f, 1.0f, 0.0f);
+            _transform->modelMat.rotate(angleX, 1.0f, 0.0f, 0.0f);
         }
 
     private:

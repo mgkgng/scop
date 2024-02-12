@@ -36,6 +36,7 @@ class Mesh {
 
             std::cout << "Mesh created successfully" << std::endl;
         }
+        
         ~Mesh() {
             glDeleteVertexArrays(1, &_vao);
             glDeleteBuffers(1, &_vbo);

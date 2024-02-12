@@ -1,4 +1,5 @@
 #version 330 core
+
 out vec4 FragColor;
 
 struct Material {
@@ -8,12 +9,42 @@ struct Material {
     float shininess;
 };
 
-uniform Material material;
+in vec4 FragPos;
+in vec3 Normal;
+
+// uniform Material material;
+uniform int hasNormals;
+uniform float isTextureEnabled;
+uniform sampler2D textureSampler;
 
 void main() {
-    // Implement lighting calculations here
-    // For example, using the Phong lighting model
-    // vec3 ambientLight = material.ambient * vec3(0.1); // Example ambient light calculation
-    // FragColor = vec4(ambientLight, 1.0);
-    FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+    vec4 baseColor;
+    vec4 textureColor;
+
+    // Base color when no texture or normals
+    if (hasNormals == 0) {
+        float greyScale = (1.0 + gl_PrimitiveID % 4) / 5.0;
+        baseColor = vec4(greyScale, greyScale, greyScale, 1.0);
+    } else {
+        // Default base color
+        baseColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+
+    // Calculate texture color
+    float scaleFactor = 1.0;
+    vec2 texCoords = mod(FragPos.xy * scaleFactor, 1.0);
+    textureColor = texture(textureSampler, texCoords);
+
+    // Transition
+    vec4 colorOutput = mix(baseColor, textureColor, isTextureEnabled);
+
+    // Apply lighting if normals are present
+    if (hasNormals > 0) {
+        vec3 lightDirection = normalize(vec3(1.0, 1.0, 1.0));
+        float diff = max(dot(Normal, lightDirection), 0.0);
+        vec3 diffuse = diff * vec3(1.0, 1.0, 1.0);
+        FragColor = vec4(diffuse, 1.0) * colorOutput;
+    } else {
+        FragColor = colorOutput;
+    }
 }

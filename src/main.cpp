@@ -47,9 +47,9 @@ int main(int argc, char** argv) {
         // shader.setVec3("material.specular", glm::vec3(material._specular.r, material._specular.g, material._specular.b));
         // shader.setFloat("material.shininess", material._specularExponent);
 
-        shader->setMat4("model", app._transform->model);
-        shader->setMat4("view", app._transform->view);
-        shader->setMat4("projection", app._transform->projection);
+        shader->setMat4("model", app._transform->modelMat);
+        shader->setMat4("view", app._transform->viewMat);
+        shader->setMat4("projection", app._transform->projectionMat);
 
         glBindVertexArray(app._mesh->getVao());
 

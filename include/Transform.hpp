@@ -6,72 +6,53 @@
 
 #include <vector>
 
-#include "MeshVertex.hpp"
+#include "objElements/Vertex.hpp"
+#include "Matrix.hpp"
 
 class Transform {
     public:
-        glm::mat4 model;
-        glm::mat4 view;
-        glm::mat4 projection;
+        Matrix modelMat;
+        Matrix viewMat;
+        Matrix projectionMat;
         glm::vec3 rotation;
         glm::vec3 objectCenter;
+        glm::vec3 cameraPos;
+        glm::vec3 cameraTarget;
+        glm::vec3 cameraUp;
 
         float fov = 45.0f;
         float aspectRatio = 960.0f / 640.0f; // Default aspect ratio
         float nearPlane = 0.1f;
         float farPlane = 100.0f;
 
-        Transform() {}
-        Transform(const std::vector<MeshVertex> vertices): model(glm::mat4(1.0f)), view(glm::mat4(1.0f)), projection(glm::mat4(1.0f)), rotation(glm::vec3(0.0f)) {
-            objectCenter = calculateObjectCenter(vertices);
+        Transform(float width, float height) {
+            this->projectionMat.setProjection(fov, width / height, 0.1f, 1000.0f);
 
-            std::cout << "Transform created successfully" << std::endl;
+            this->modelMat.setModel(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+
+            float cameraPos[] = {0.0f, 0.0f, 3.0f};
+            float targetPos[] = {0.0f, 0.0f, 0.0f};
+            float upVector[] = {0.0f, 1.0f, 0.0f};
+            Matrix view_matrix;
+            view_matrix.setView(cameraPos, targetPos, upVector);
         }
 
-        void updateModelMatrix(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
-            this->rotation = rotation;
-            model = glm::mat4(1.0f);
-
-            // Translate to origin (object's center)
-            model = glm::translate(model, -objectCenter);
-
-            // Apply rotation
-            model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-            
-            // Translate back to original position
-            model = glm::translate(model, objectCenter);
-
-            // Apply translation and scale
-            model = glm::translate(model, position);
-            model = glm::scale(model, scale);
-        }
-
-        void updateViewMatrix(glm::vec3 cameraPos, glm::vec3 cameraTarget, glm::vec3 cameraUp) {
-            view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
-        }
-
-        void updateProjectionMatrix() {
-            projection = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
-        }
-        
         void reset() {
-            model = glm::mat4(1.0f);
-            view = glm::mat4(1.0f);
-            projection = glm::mat4(1.0f);
+            this->modelMat.setToIdentity();
+            this->viewMat.setToIdentity();
+            this->projectionMat.setToIdentity();
         }
 
-        glm::vec3 calculateObjectCenter(const std::vector<MeshVertex>& vertices) {
-            glm::vec3 center(0.0f, 0.0f, 0.0f);
-            for (const auto& vertex : vertices)
-                center += glm::vec3(vertex.position); // Assuming each vertex has a 'position' attribute
-            center /= static_cast<float>(vertices.size());
-            return center;
-        }
+        // glm::vec3 calculateObjectCenter(const std::vector<Vertex>& vertices) {
+        //     // std::cout << "vertex size: " << vertices.size() << std::endl;
+        //     // std::cout << "camera view: " << view[3][0] << ", " << view[3][1] << ", " << view[3][2] << std::endl;
+        //     // std::cout << "object scale: " << glm::length(glm::vec3(model[0])) << ", " << glm::length(glm::vec3(model[1])) << ", " << glm::length(glm::vec3(model[2])) << std::endl;
+        //     // glm::vec3 center(0.0f, 0.0f, 0.0f);
+        //     // for (const auto& vertex : vertices)
+        //     //     center += glm::vec3(vertex.x, vertex.y, vertex.z);
+        //     // std::cout << "here center: " << center.x << ", " << center.y << ", " << center.z << std::endl;
+        //     // center /= static_cast<float>(vertices.size());
+        //     // return center;
+        // }
 
-        void setFOV(float f) {
-            fov = f;
-            updateProjectionMatrix();
-        }
 };
