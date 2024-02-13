@@ -6,9 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "Matrix.hpp"
 
 class Shader {
@@ -50,8 +47,8 @@ class Shader {
             glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, mat.get_data());
         }
 
-        void setVec3(const std::string &name, const glm::vec3 &vec) const {
-            glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, glm::value_ptr(vec));
+        void setVec3(const std::string &name, const std::array<float, 3> &vec) const {
+            glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, vec.data());
         }
     private:
         GLuint _id;

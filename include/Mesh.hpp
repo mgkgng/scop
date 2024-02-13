@@ -1,9 +1,6 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
 #include "Parser.hpp"
@@ -16,9 +13,11 @@ class Mesh {
             
             parseObj(obj);
 
+            std::cout << "wher is it" << std::endl;
             glGenVertexArrays(1, &_vao);
             glBindVertexArray(_vao);
 
+            std::cout << "111" << std::endl;
             glGenBuffers(1, &_vbo);
             glBindBuffer(GL_ARRAY_BUFFER, _vbo);
             glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(MeshVertex), _vertices.data(), GL_STATIC_DRAW);
@@ -28,6 +27,7 @@ class Mesh {
 
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void *)offsetof(MeshVertex, normal));
             glEnableVertexAttribArray(1);
+            std::cout << "44" << std::endl;
 
             glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void *)offsetof(MeshVertex, texCoord));
             glEnableVertexAttribArray(2);
@@ -54,18 +54,15 @@ class Mesh {
                     for (size_t i = 0; i < face.vertexCount; i++) {
                         MeshVertex meshVertex;
                         auto vertex = obj.getVertexByIndex(face.vertexIndices[i]);
-                        meshVertex.position = glm::vec4(vertex.x, vertex.y, vertex.z, vertex.w);
-
+                        meshVertex.position = std::array<float, 4>{vertex.x, vertex.y, vertex.z, vertex.w};
                         if (!face.textureIndices.empty()) {
                             auto texCoord = obj.getTexCoordByIndex(face.textureIndices[i]);
-                            meshVertex.texCoord = glm::vec3(texCoord.u, texCoord.v, texCoord.w);
+                            meshVertex.texCoord = std::array<float, 3>{texCoord.u, texCoord.v, texCoord.w};
                         }
-
                         if (!face.normalIndices.empty()) {
                             auto normal = obj.getNormalByIndex(face.normalIndices[i]);
-                            meshVertex.normal = glm::vec3(normal.x, normal.y, normal.z);
+                            meshVertex.normal = std::array<float, 3>{normal.x, normal.y, normal.z};
                         }
-
                         _vertices.push_back(meshVertex);
                     }
                 }

@@ -29,10 +29,16 @@ class App {
         ~App() { glfwTerminate(); }
 
         void init() {
+            std::cout << "Initializing SCOP App" << std::endl;
             if (!glfwInit()) {
                 std::cerr << "Failed to initialize GLFW" << std::endl;
                 exit(1);
             }
+
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
             _window = glfwCreateWindow(WIDTH, HEIGHT, "SCOP", nullptr, nullptr);
             if (!_window) {
@@ -54,6 +60,7 @@ class App {
                 std::cerr << "Failed to initialize GLEW" << std::endl;
                 exit(1);
             }
+            std::cout << "App initialized" << std::endl;
         }
 
         void run(std::function<void()> loop) {

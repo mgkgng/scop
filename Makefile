@@ -8,10 +8,12 @@ INCLUDE_DIR := include
 CXX := g++
 
 # Compiler flags
-CXXFLAGS := -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra -Werror
+CXXFLAGS := -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra -Werror -fsanitize=address
 
 # Libraries
-LIBS := -lGLEW -lglfw -lGL
+LIBS := -L./lib -lGLEW -lglfw 
+
+OPENGL := -framework OpenGL
 
 SRC := $(wildcard $(SRC_DIR)/*.cpp)
 OBJ := $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
@@ -22,6 +24,9 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(CXX) $(OBJ) -o $@ $(LIBS)
+
+mac: $(OBJ)
+	$(CXX) $(OBJ) $(CXXFLAGS) $(LIBS) $(OPENGL) -o $(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

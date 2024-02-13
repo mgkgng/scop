@@ -9,8 +9,8 @@ struct Material {
     float shininess;
 };
 
-in vec4 FragPos;
-in vec3 Normal;
+in vec4 fragPos;
+in vec3 normal;
 
 // uniform Material material;
 uniform int hasNormals;
@@ -32,7 +32,7 @@ void main() {
 
     // Calculate texture color
     float scaleFactor = 1.0;
-    vec2 texCoords = mod(FragPos.xy * scaleFactor, 1.0);
+    vec2 texCoords = mod(fragPos.xy * scaleFactor, 1.0);
     textureColor = texture(textureSampler, texCoords);
 
     // Transition
@@ -41,7 +41,7 @@ void main() {
     // Apply lighting if normals are present
     if (hasNormals > 0) {
         vec3 lightDirection = normalize(vec3(1.0, 1.0, 1.0));
-        float diff = max(dot(Normal, lightDirection), 0.0);
+        float diff = max(dot(normal, lightDirection), 0.0);
         vec3 diffuse = diff * vec3(1.0, 1.0, 1.0);
         FragColor = vec4(diffuse, 1.0) * colorOutput;
     } else {

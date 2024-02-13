@@ -1,9 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 struct MeshVertex {
-    glm::vec4 position;
-    glm::vec3 normal;
-    glm::vec3 texCoord;
+    std::array<float, 4> position;
+    std::array<float, 3> normal;
+    std::array<float, 3> texCoord;
 };
