@@ -142,7 +142,9 @@ class Parser {
                 os << "mtllib " << m << std::endl;
             }
             for (auto const &o : parser._objects) {
+                os << "------------";
                 os << o.second << std::endl;
+                os << "============";
             }
             for (auto const &m : parser._materialLibraries) {
                 os << m << std::endl;
@@ -159,7 +161,7 @@ class Parser {
         void checkObjExist() {
             if (currentObject == nullptr) {
                 _objects.emplace("default", Object(""));
-                currentObject = &_objects[""];
+                currentObject = &_objects["default"];
             }
         }
 

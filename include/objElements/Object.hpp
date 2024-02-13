@@ -48,6 +48,7 @@ struct Object {
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Object& object) {
+        os << "object name: " << object._name << std::endl;
         if (!object._name.empty())
             os << "o " << object._name << std::endl;
         for (const auto& v : object._vertices)

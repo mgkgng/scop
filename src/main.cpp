@@ -29,6 +29,10 @@ int main(int argc, char** argv) {
     }
 
     auto objects = parser->getObjects();
+    if (objects.size() != 1) {
+        std::cerr << "We support for 1 object." << std::endl;
+        return 1;
+    }
     App app(objects);
 
     try {
@@ -40,7 +44,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    app.run([&]() {    
+    app.run([&]() {
         shader->use();
         // shader.setVec3("material.ambient", glm::vec3(material._ambient.r, material._ambient.g, material._ambient.b));
         // shader.setVec3("material.diffuse", glm::vec3(material._diffuse.r, material._diffuse.g, material._diffuse.b));

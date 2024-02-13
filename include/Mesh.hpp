@@ -13,11 +13,9 @@ class Mesh {
             
             parseObj(obj);
 
-            std::cout << "wher is it" << std::endl;
             glGenVertexArrays(1, &_vao);
             glBindVertexArray(_vao);
 
-            std::cout << "111" << std::endl;
             glGenBuffers(1, &_vbo);
             glBindBuffer(GL_ARRAY_BUFFER, _vbo);
             glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(MeshVertex), _vertices.data(), GL_STATIC_DRAW);
@@ -27,7 +25,6 @@ class Mesh {
 
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void *)offsetof(MeshVertex, normal));
             glEnableVertexAttribArray(1);
-            std::cout << "44" << std::endl;
 
             glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void *)offsetof(MeshVertex, texCoord));
             glEnableVertexAttribArray(2);

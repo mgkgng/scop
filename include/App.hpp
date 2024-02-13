@@ -21,8 +21,7 @@ class App {
         std::unique_ptr<Transform> _transform;
 
         App(const std::unordered_map<std::string, Object> &objects) {
-            init();
-            _mesh = std::make_unique<Mesh>(objects.at("Cube"));
+            _mesh = std::make_unique<Mesh>(objects.begin()->second);
             _transform = std::make_unique<Transform>(WIDTH, HEIGHT);
             std::cout << "App created successfully" << std::endl;
         }
