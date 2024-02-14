@@ -10,7 +10,7 @@
 
 class Shader {
     public:
-        Shader(const char *vertexPath, const char *fragmentPath) {
+        Shader(const char *vertexPath, const char *fragmentPath, bool hasNormals) {
             std::string vertexSource = getFileString(vertexPath);
             std::string fragmentSource = getFileString(fragmentPath);
 
@@ -33,6 +33,11 @@ class Shader {
                 std::cerr << "ERROR::SHADER::LINKING_FAILED\n" << infoLog << std::endl;
             }
 
+            glUseProgram(_id);
+
+            GLuint hasNormalsLoc = glGetUniformLocation(_id, "hasNormals");
+            glUniform1i(hasNormalsLoc, hasNormals);
+
             glDeleteShader(vertexShader);
             glDeleteShader(fragmentShader);
 
@@ -42,6 +47,13 @@ class Shader {
 
         void use() { glUseProgram(_id); }
         GLuint getId() const { return _id; }
+
+        void update(bool hasNormals) {
+            if (hasNormals) {
+                GLuint hasNormalsLoc = glGetUniformLocation(_id, "hasNormals");
+                glUniform1i(hasNormalsLoc, 1);
+            }
+        }
 
         void setMat4(const std::string &name, Matrix &mat) const {
             glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, mat.get_data());

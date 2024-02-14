@@ -58,6 +58,8 @@ class App {
                 std::cerr << "Failed to initialize GLEW" << std::endl;
                 exit(1);
             }
+
+            glEnable(GL_DEPTH_TEST);
             std::cout << "App initialized" << std::endl;
         }
 

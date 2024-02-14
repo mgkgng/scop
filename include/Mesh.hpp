@@ -58,6 +58,8 @@ class Mesh {
                             meshVertex.texCoord = std::array<float, 3>{texCoord.u, texCoord.v, texCoord.w};
                         }
                         if (!face.normalIndices.empty()) {
+                            if (!_hasNormals)
+                                _hasNormals = true;
                             auto normal = obj.getNormalByIndex(face.normalIndices[i]);
                             meshVertex.normal = std::array<float, 3>{normal.x, normal.y, normal.z};
                         }
@@ -70,12 +72,14 @@ class Mesh {
             }
             _vertexCount = _vertices.size();
             std::array<float, 3> vertexAvg = {vertexSum[0] / _vertexCount, vertexSum[1] / _vertexCount, vertexSum[2] / _vertexCount};
-            for (auto vec : _vertices) {
+            for (auto &vec : _vertices) {
                 vec.position[0] -= vertexAvg[0];
                 vec.position[1] -= vertexAvg[1];
                 vec.position[2] -= vertexAvg[2];
             }
         }
+
+        bool getHasNormals() const { return _hasNormals; }
 
         GLuint getVao() const { return _vao; }
         std::vector<MeshVertex> const &getVertices() const { return _vertices; }
@@ -84,4 +88,5 @@ class Mesh {
         GLuint _vao, _vbo;
         std::vector<MeshVertex> _vertices;
         size_t _vertexCount;
+        bool _hasNormals = false;
 };

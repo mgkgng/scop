@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     App app(objects);
 
     try {
-        shader = std::make_unique<Shader>("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
+        shader = std::make_unique<Shader>("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", app._mesh->getHasNormals());
         std::cout << "Shader compilation done successfully" << std::endl;
     } catch (std::exception const &e) {
         std::cerr << "Failed to compile shaders" << std::endl;
