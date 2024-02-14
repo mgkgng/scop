@@ -46,6 +46,7 @@ class Mesh {
         }
 
         void parseObj(Object const &obj) {
+            std::array<float, 3> vertexSum = {0.f, 0.f, 0.f};
             for (auto const &group : obj._groups) {
                 for (auto const &face : group.second.faces) {
                     for (size_t i = 0; i < face.vertexCount; i++) {
@@ -61,10 +62,19 @@ class Mesh {
                             meshVertex.normal = std::array<float, 3>{normal.x, normal.y, normal.z};
                         }
                         _vertices.push_back(meshVertex);
+                        vertexSum[0] += vertex.x;
+                        vertexSum[1] += vertex.y;
+                        vertexSum[2] += vertex.z;
                     }
                 }
             }
             _vertexCount = _vertices.size();
+            std::array<float, 3> vertexAvg = {vertexSum[0] / _vertexCount, vertexSum[1] / _vertexCount, vertexSum[2] / _vertexCount};
+            for (auto vec : _vertices) {
+                vec.position[0] -= vertexAvg[0];
+                vec.position[1] -= vertexAvg[1];
+                vec.position[2] -= vertexAvg[2];
+            }
         }
 
         GLuint getVao() const { return _vao; }
@@ -74,6 +84,4 @@ class Mesh {
         GLuint _vao, _vbo;
         std::vector<MeshVertex> _vertices;
         size_t _vertexCount;
-
-        
 };

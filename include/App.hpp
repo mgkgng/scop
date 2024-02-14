@@ -10,7 +10,7 @@
 #include "Mesh.hpp"
 #include "Parser.hpp"
 
-#define WIDTH 1280.0f
+#define WIDTH 960.0f
 #define HEIGHT 720.0f
 
 class App {
@@ -21,6 +21,7 @@ class App {
         std::unique_ptr<Transform> _transform;
 
         App(const std::unordered_map<std::string, Object> &objects) {
+            init();
             _mesh = std::make_unique<Mesh>(objects.begin()->second);
             _transform = std::make_unique<Transform>(WIDTH, HEIGHT);
             std::cout << "App created successfully" << std::endl;
@@ -47,9 +48,7 @@ class App {
             }
 
             glfwMakeContextCurrent(_window);
-
             glfwSetWindowUserPointer(_window, this);
-
             glfwSetKeyCallback(_window, App::keyCallback);
             glfwSetMouseButtonCallback(_window, App::mouseButtonCallback);
             glfwSetCursorPosCallback(_window, App::cursorPositionCallback);

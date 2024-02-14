@@ -8,10 +8,11 @@ INCLUDE_DIR := include
 CXX := g++
 
 # Compiler flags
-CXXFLAGS := -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra -Werror -fsanitize=address
+CXXFLAGS := -I$(INCLUDE_DIR) -std=c++17 -Wall -Wextra -Werror #-fsanitize=address
 
 # Libraries
 LIBS := -L./lib -lGLEW -lglfw 
+LIBS_LINUX := -lGLEW -lglfw -lGL
 
 OPENGL := -framework OpenGL
 
@@ -23,7 +24,7 @@ TARGET := $(BIN_DIR)/scop
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $@ $(LIBS)
+	$(CXX) $(OBJ) -o $@ $(LIBS_LINUX)
 
 mac: $(OBJ)
 	$(CXX) $(OBJ) $(CXXFLAGS) $(LIBS) $(OPENGL) -o $(TARGET)
