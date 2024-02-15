@@ -74,7 +74,11 @@ class Shader {
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
-        void use() { glUseProgram(_id); }
+        void use() {
+            glUseProgram(_id);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, _textureId);
+        }
         GLuint getId() const { return _id; }
 
         void update(bool hasNormals) {
@@ -91,6 +95,11 @@ class Shader {
         void setVec3(const std::string &name, const std::array<float, 3> &vec) const {
             glUniform3fv(glGetUniformLocation(_id, name.c_str()), 1, vec.data());
         }
+
+        void setTexture(const std::string &name, int textureUnit) const {
+            glUniform1i(glGetUniformLocation(_id, name.c_str()), textureUnit);
+        }
+        
     private:
         GLuint _id;
 

@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
         shader->use();
 
         if (app.isInTransition) {
-            glActiveTexture(GL_TEXTURE0); // Activate the first texture unit
-            glBindTexture(GL_TEXTURE_2D, shader->_textureId); // Bind the texture
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, shader->_textureId);
             app.updateTextureTransition(shader->getId());
         }
         shader->setMat4("model", app._transform->modelMat);

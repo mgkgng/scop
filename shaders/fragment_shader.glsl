@@ -14,7 +14,7 @@ in vec3 normal;
 
 // uniform Material material;
 uniform int hasNormals;
-uniform float isTextureEnabled;
+uniform float textureState;
 uniform sampler2D textureSampler;
 
 void main() {
@@ -36,7 +36,7 @@ void main() {
     textureColor = texture(textureSampler, texCoords);
 
     // Transition
-    vec4 colorOutput = mix(baseColor, textureColor, isTextureEnabled);
+    vec4 colorOutput = mix(baseColor, textureColor, textureState);
 
     // Apply lighting if normals are present
     if (hasNormals > 0) {

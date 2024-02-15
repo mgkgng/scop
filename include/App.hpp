@@ -186,8 +186,6 @@ class App {
                         }
                     }
 
-                    std::cout << "textureState: " << textureState << std::endl;
-                    // Update the uniform variable in the shader
                     GLint textureStateLoc = glGetUniformLocation(_id, "textureState");
                     glUniform1f(textureStateLoc, textureState);
             }
