@@ -6,14 +6,15 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec4 fragPos;
+out vec3 fragPos;
 out vec3 normal;
 
 uniform int hasNormals;
 
 void main() {
     gl_Position = gl_Position = projection * view * model * aPos;
-    fragPos = aPos;
+    fragPos = vec3(model * aPos).xyz;
+;
 
     if (hasNormals > 0)
         normal = mat3(model) * aNormal;

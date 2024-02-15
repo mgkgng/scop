@@ -7,10 +7,19 @@
 #include <sstream>
 
 #include "Matrix.hpp"
+// #include "BMP.hpp"
 
 class Shader {
     public:
-        Shader(const char *vertexPath, const char *fragmentPath, bool hasNormals) {
+        GLuint _textureId;
+
+        Shader(
+            const char *vertexPath, 
+            const char *fragmentPath, 
+            bool hasNormals, 
+            float *textureState,
+            BMP &texture
+        ) {
             std::string vertexSource = getFileString(vertexPath);
             std::string fragmentSource = getFileString(fragmentPath);
 
@@ -37,13 +46,33 @@ class Shader {
 
             GLuint hasNormalsLoc = glGetUniformLocation(_id, "hasNormals");
             glUniform1i(hasNormalsLoc, hasNormals);
+            GLint textureStateLoc = glGetUniformLocation(_id, "textureStateLoc");
+			glUniform1f(textureStateLoc, *textureState);
+
+            loadTexture(texture);
 
             glDeleteShader(vertexShader);
             glDeleteShader(fragmentShader);
 
             std::cout << "Shader created successfully" << std::endl;
+
         }
         ~Shader() { glDeleteProgram(_id); }
+
+        void loadTexture(BMP &texture) {
+            glGenTextures(1, &_textureId);
+            glBindTexture(GL_TEXTURE_2D, _textureId);
+
+            /* Set texture parameters */
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            /* Upload texture data */
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data.data());
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
 
         void use() { glUseProgram(_id); }
         GLuint getId() const { return _id; }

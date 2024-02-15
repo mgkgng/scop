@@ -10,8 +10,8 @@
 #include "Transform.hpp"
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <obj file>" << std::endl;
+    if (argc != 2 && argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <obj file> [<texture file>]" << std::endl;
         return -1;
     }
 
@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     std::unique_ptr<Shader> shader;
 
     try {
-        parser = std::make_unique<Parser>(argv[1]);
+        parser = std::make_unique<Parser>(argv[1], argc == 3 ? argv[2] : "assets/textures/wood.bmp");
         std::cout << "Parsing done successfully" << std::endl;
         // std::cout << *parser << std::endl;
     } catch (std::exception const &e) {
@@ -29,14 +29,18 @@ int main(int argc, char** argv) {
     }
 
     auto objects = parser->getObjects();
-    if (objects.size() != 1) {
-        std::cerr << "We support for 1 object." << std::endl;
+    if (!objects.size()) {
+        std::cerr << "No object found in file: " << argv[1] << std::endl;
         return 1;
     }
     App app(objects);
 
     try {
-        shader = std::make_unique<Shader>("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", app._mesh->getHasNormals());
+        shader = std::make_unique<Shader>(
+            "shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl",
+            app.hasNormals, 
+            &app.textureState,
+            parser->getTexture());
         std::cout << "Shader compilation done successfully" << std::endl;
     } catch (std::exception const &e) {
         std::cerr << "Failed to compile shaders" << std::endl;
@@ -46,18 +50,18 @@ int main(int argc, char** argv) {
 
     app.run([&]() {
         shader->use();
-        // shader.setVec3("material.ambient", glm::vec3(material._ambient.r, material._ambient.g, material._ambient.b));
-        // shader.setVec3("material.diffuse", glm::vec3(material._diffuse.r, material._diffuse.g, material._diffuse.b));
-        // shader.setVec3("material.specular", glm::vec3(material._specular.r, material._specular.g, material._specular.b));
-        // shader.setFloat("material.shininess", material._specularExponent);
 
+        if (app.isInTransition) {
+            glActiveTexture(GL_TEXTURE0); // Activate the first texture unit
+            glBindTexture(GL_TEXTURE_2D, shader->_textureId); // Bind the texture
+            app.updateTextureTransition(shader->getId());
+        }
         shader->setMat4("model", app._transform->modelMat);
         shader->setMat4("view", app._transform->viewMat);
         shader->setMat4("projection", app._transform->projectionMat);
 
-        glBindVertexArray(app._mesh->getVao());
-
         app._mesh->draw();
+
     });
 
     return 0;

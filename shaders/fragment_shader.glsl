@@ -9,7 +9,7 @@ struct Material {
     float shininess;
 };
 
-in vec4 fragPos;
+in vec3 fragPos;
 in vec3 normal;
 
 // uniform Material material;

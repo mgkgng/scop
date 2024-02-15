@@ -12,17 +12,23 @@
 
 #define WIDTH 960.0f
 #define HEIGHT 720.0f
+#define TRANSITION_SPEED 0.05f
+
 
 class App {
     public:
         bool isDragging = false;
+        bool isInTransition = false;
+        bool hasNormals = false;
+        float textureState = 0.0f;
         double lastX = 0.0, lastY = 0.0;
+        float _textureTarget;
         std::unique_ptr<Mesh> _mesh;
         std::unique_ptr<Transform> _transform;
 
         App(const std::unordered_map<std::string, Object> &objects) {
             init();
-            _mesh = std::make_unique<Mesh>(objects.begin()->second);
+            _mesh = std::make_unique<Mesh>(objects);
             _transform = std::make_unique<Transform>(WIDTH, HEIGHT);
             std::cout << "App created successfully" << std::endl;
         }
@@ -65,6 +71,7 @@ class App {
 
         void run(std::function<void()> loop) {
             while (!glfwWindowShouldClose(_window)) {
+                glClearColor(231.0f / 255.0f, 87.0f / 255.0f, 51.0f / 255.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 loop();
                 glfwSwapBuffers(_window);
@@ -76,8 +83,34 @@ class App {
             // Handle key events here
             (void) scancode;
             (void) mods;
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+            App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+            if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+                switch (key) {
+                    case GLFW_KEY_ESCAPE:
+                        glfwSetWindowShouldClose(window, GLFW_TRUE);
+                        break;
+                    case GLFW_KEY_T:
+                        if (app) app->applyTexture();
+                        break;
+                    case GLFW_KEY_UP:
+                    case GLFW_KEY_W:
+                        if (app) app->_transform->modelMat.move(0.f, 1.f, 0.f);
+                        break;
+                    case GLFW_KEY_DOWN:
+                    case GLFW_KEY_S:
+                        if (app) app->_transform->modelMat.move(0.f, -1.f, 0.f);
+                        break;
+                    case GLFW_KEY_LEFT:
+                    case GLFW_KEY_A:
+                        if (app) app->_transform->modelMat.move(-1.f, 0.f, 0.f);
+                        break;
+                    case GLFW_KEY_RIGHT:
+                    case GLFW_KEY_D:
+                        if (app) app->_transform->modelMat.move(1.f, 0.f, 0.f);
+                        break;
+                    // Add more cases as needed
+                }
             }
         }
 
@@ -130,6 +163,35 @@ class App {
             _transform->modelMat.rotate(angleY, 0.0f, 1.0f, 0.0f);
             _transform->modelMat.rotate(angleX, 1.0f, 0.0f, 0.0f);
         }
+
+        	void applyTexture() {
+                if (isInTransition) return;
+                _textureTarget = (textureState == 0.0f) ? 1.0f : 0.0f;
+                isInTransition = true;
+            }
+
+            void updateTextureTransition(GLuint _id) {
+                    /* Move is_texture_enabled towards target value */ 
+                    if (textureState < _textureTarget) {
+                        textureState += TRANSITION_SPEED;
+                        if (textureState > _textureTarget) {
+                            textureState = _textureTarget;
+                            isInTransition = false;
+                        }
+                    } else {
+                        textureState -= TRANSITION_SPEED;
+                        if (textureState < _textureTarget) {
+                            textureState = _textureTarget;
+                            isInTransition = false;
+                        }
+                    }
+
+                    std::cout << "textureState: " << textureState << std::endl;
+                    // Update the uniform variable in the shader
+                    GLint textureStateLoc = glGetUniformLocation(_id, "textureState");
+                    glUniform1f(textureStateLoc, textureState);
+            }
+
 
     private:
         GLFWwindow* _window;

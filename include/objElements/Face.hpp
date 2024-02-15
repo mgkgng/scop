@@ -74,13 +74,13 @@ struct Face {
                 firstVertex = false;
             } else {
                 if (type == VERTEX_ONLY && (!textureIndices.empty() || !normalIndices.empty()))
-                    throw std::runtime_error("Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
+                    throw std::runtime_error("1Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
                 else if (type == VERTEX_TEX && (!textureIndices.empty() || normalIndices.empty()))
-                    throw std::runtime_error("Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
-                else if (type == VERTEX_NORMAL && (textureIndices.empty() || !normalIndices.empty()))
-                    throw std::runtime_error("Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
+                    throw std::runtime_error("2Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
+                // else if (type == VERTEX_NORMAL && (textureIndices.empty() || !normalIndices.empty()))
+                //     throw std::runtime_error("3Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
                 else if (type == VERTEX_TEX_NORMAL && (textureIndices.empty() || normalIndices.empty()))
-                    throw std::runtime_error("Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
+                    throw std::runtime_error("4Error parsing face element: vertex type mismatch. line: " + std::to_string(lineNb));
             }
         }
 
